@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Matrix
 import android.os.Bundle
-import android.util.Log
 import android.util.Size
 import android.view.Surface
 import android.view.TextureView
@@ -15,9 +14,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.google.firebase.ml.vision.FirebaseVision
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
-import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import java.util.concurrent.Executors
 
 private const val REQUEST_CODE_PERMISSIONS = 10
@@ -123,31 +119,4 @@ class MainActivity : AppCompatActivity() {
 }
 
 
-private class MyImageAnalyzer: ImageAnalysis.Analyzer {
 
-    private fun degreesToFirebaseRotation(degrees: Int): Int = when(degrees){
-        0 -> FirebaseVisionImageMetadata.ROTATION_0
-        90 -> FirebaseVisionImageMetadata.ROTATION_90
-        180 -> FirebaseVisionImageMetadata.ROTATION_180
-        270 -> FirebaseVisionImageMetadata.ROTATION_270
-        else -> throw Exception("Rotation must be 0, 90, 180, or 270.")
-
-    }
-
-    override fun analyze(image: ImageProxy?, rotationDegrees: Int) {
-        val mediaImage = image?.image
-        val imageRotation = degreesToFirebaseRotation(rotationDegrees)
-
-        if (mediaImage != null){
-            val image = FirebaseVisionImage.fromMediaImage(mediaImage, imageRotation)
-
-            val detector = FirebaseVision.getInstance().onDeviceTextRecognizer
-
-            detector.processImage(image)
-                .addOnSuccessListener{firebaseVisionText ->
-                    println(firebaseVisionText.text)} //TODO Data binding
-                .addOnFailureListener { exception -> Log.e("Exception", "${exception.printStackTrace()}") }
-        }
-
-    }
-}
