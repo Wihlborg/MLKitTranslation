@@ -14,6 +14,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
+import com.example.mlkittranslation.databinding.ActivityMainBinding
 import java.util.concurrent.Executors
 
 private const val REQUEST_CODE_PERMISSIONS = 10
@@ -21,12 +24,16 @@ private const val REQUEST_CODE_PERMISSIONS = 10
 private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var analyzer: MyImageAnalyzer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val binding:ActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        val textDataViewModel = ViewModelProvider(this).get(TextDataViewModel::class.java)
 
-
-        setContentView(R.layout.activity_main)
+        binding.textData =  textDataViewModel
+        binding.lifecycleOwner = this
+        this.analyzer = MyImageAnalyzer(textDataViewModel)
 
         viewFinder = findViewById(R.id.view_finder)
 
@@ -40,8 +47,6 @@ class MainActivity : AppCompatActivity() {
             updateTransform()
         }
     }
-
-    private val analyzer = MyImageAnalyzer()
     private val executor = Executors.newSingleThreadExecutor()
     private lateinit var viewFinder: TextureView
 
