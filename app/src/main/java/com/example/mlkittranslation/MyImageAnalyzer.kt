@@ -1,6 +1,5 @@
 package com.example.mlkittranslation
 
-import android.provider.Settings
 import android.util.Log
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
@@ -9,7 +8,7 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 
 class MyImageAnalyzer(_viewModel: TextDataViewModel): ImageAnalysis.Analyzer {
-    val viewModel = _viewModel
+    private val viewModel = _viewModel
 
     private fun degreesToFirebaseRotation(degrees: Int): Int = when(degrees){
         0 -> FirebaseVisionImageMetadata.ROTATION_0
@@ -25,15 +24,14 @@ class MyImageAnalyzer(_viewModel: TextDataViewModel): ImageAnalysis.Analyzer {
         val mediaImage = image?.image
 
         if (mediaImage != null){
-            val image = FirebaseVisionImage.fromMediaImage(mediaImage, degreesToFirebaseRotation(rotationDegrees))
+            val firebaseVisionImage = FirebaseVisionImage.fromMediaImage(mediaImage, degreesToFirebaseRotation(rotationDegrees))
 
             val detector = FirebaseVision.getInstance().onDeviceTextRecognizer
 
-            detector.processImage(image)
+            detector.processImage(firebaseVisionImage)
                 .addOnSuccessListener{firebaseVisionText ->
-                    val text = firebaseVisionText.text.replace(System.lineSeparator(), " ", true)
-                    this.viewModel.updateText(text)
-                    println(text)}
+                    val text = firebaseVisionText.text.replace(System.lineSeparator(), " ", true) //Make it single line
+                    this.viewModel.updateText(text)}
                 .addOnFailureListener { exception -> Log.e("Exception", "${exception.printStackTrace()}") }
         }
 

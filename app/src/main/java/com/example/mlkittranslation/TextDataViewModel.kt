@@ -10,8 +10,7 @@ class TextDataViewModel : ViewModel(){
     val text: LiveData<String> = _text
 
     fun updateText(newText: String){
-        _text.setValue(newText)
-
+        _text.value = newText
     }
 
 }
